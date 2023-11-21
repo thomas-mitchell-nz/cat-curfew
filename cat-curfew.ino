@@ -2,7 +2,7 @@
  * Filename: cut-curfew.ino
  * FileType: Arduino source file
  * Author: Thomas Mitchell
- * Last modified: 31/7/2023
+ * Last modified: 21/11/2023
  * Description: Uses RTC alarms to toggle servo twice a day
  */
 
@@ -13,8 +13,8 @@
  
 /*** CHANGE THESE ***/
 // servo open and close angles
-#define OPEN  0
-#define CLOSE 90
+#define OPEN  90
+#define CLOSE 0
 
 constexpr uint8_t SQW_PIN {2};  // RTC provides an alarm signal on this pin
 const int BUTTON_PIN = 3;
@@ -45,9 +45,9 @@ void setup()
     /*** CHANGE THESE ***/
     // set the RTC time
     tmElements_t tm;
-    tm.Hour = 10;              
-    tm.Minute = 30;
-    tm.Second = 30;
+    tm.Hour = 3;              
+    tm.Minute = 56;
+    tm.Second = 0;
     tm.Day = 1;
     tm.Month = 1;
     tm.Year = 2023 - 1970;      // tmElements_t.Year is the offset from 1970
@@ -58,9 +58,9 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), debounceHandler, RISING);
 
     /*** CHANGE THESE ***/
-    // set alarms for 07:30:00 and 16:30:00
-    myRTC.setAlarm(DS3232RTC::ALM1_MATCH_HOURS, 30, 7, 1);
-    myRTC.setAlarm(DS3232RTC::ALM2_MATCH_HOURS, 30, 16, 1);
+    // set alarms for 05:30:00 and 19:00:00
+    myRTC.setAlarm(DS3232RTC::ALM1_MATCH_HOURS, 30, 5, 1);
+    myRTC.setAlarm(DS3232RTC::ALM2_MATCH_HOURS, 0, 19, 1);
 
     // clear the alarm flags
     myRTC.alarm(DS3232RTC::ALARM_1);
@@ -72,7 +72,7 @@ void setup()
 
     // move servo to 'open' position
     myServo.attach(SERVO_PIN);
-    toggleServo();
+    openServo();
 }
 
 void loop() {
@@ -81,12 +81,12 @@ void loop() {
     if (myRTC.alarm(DS3232RTC::ALARM_1)) {  // resets the alarm flag if set
       printDateTime( myRTC.get() );
       Serial << "  Alarm 1\n";
-      toggleServo();
+      openServo();
     }
     else if (myRTC.alarm(DS3232RTC::ALARM_2)) {
       printDateTime( myRTC.get() );
       Serial << "  Alarm 2\n";
-      toggleServo();
+      closeServo();
     }
   }
 }
@@ -95,21 +95,26 @@ void debounceHandler()
 {
   if((long)(micros() - last_micros) >= debouncing_time * 1000) {
     last_micros = micros();
-    toggleServo();
+    if (closed) {
+      openServo();
+    } else {
+      closeServo();
+    } 
   }
 }
 
-void toggleServo()
+void closeServo()
 {
-    if (closed) {
-      myServo.write(CLOSE);
-      closed = false;
-      Serial.println("OPENED");
-    } else {
-      myServo.write(OPEN);
-      closed = true;
-      Serial.println("CLOSED");
-    }   
+  myServo.write(CLOSE);
+  closed = true;
+  Serial.println("CLOSED");
+}
+
+void openServo()
+{
+  myServo.write(OPEN);
+  closed = false;
+  Serial.println("OPENED");
 }
 
 void printDateTime(time_t t)
