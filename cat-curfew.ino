@@ -14,7 +14,7 @@
 /*** CHANGE THESE ***/
 // servo open and close angles
 #define OPEN  90
-#define CLOSE 0
+#define CLOSE 270
 
 constexpr uint8_t SQW_PIN {2};  // RTC provides an alarm signal on this pin
 const int BUTTON_PIN = 3;
@@ -45,9 +45,9 @@ void setup()
     /*** CHANGE THESE ***/
     // set the RTC time
     tmElements_t tm;
-    tm.Hour = 3;              
-    tm.Minute = 56;
-    tm.Second = 0;
+    tm.Hour = 19;              
+    tm.Minute = 59;
+    tm.Second = 45;
     tm.Day = 1;
     tm.Month = 1;
     tm.Year = 2023 - 1970;      // tmElements_t.Year is the offset from 1970
@@ -59,8 +59,8 @@ void setup()
 
     /*** CHANGE THESE ***/
     // set alarms for 05:30:00 and 19:00:00
-    myRTC.setAlarm(DS3232RTC::ALM1_MATCH_HOURS, 30, 5, 1);
-    myRTC.setAlarm(DS3232RTC::ALM2_MATCH_HOURS, 0, 19, 1);
+    myRTC.setAlarm(DS3232RTC::ALM1_MATCH_HOURS, 0, 7, 1);
+    myRTC.setAlarm(DS3232RTC::ALM2_MATCH_HOURS, 0, 20, 1);
 
     // clear the alarm flags
     myRTC.alarm(DS3232RTC::ALARM_1);
