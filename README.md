@@ -1,5 +1,5 @@
 ## Automatic Cat Door
-An Arduino-based automated pet door that operates on a real-time schedule and allows manual override.
+An Arduino-based automated pet door that operates on a real-time clock and allows manual override.
 
 **Features:**
 - Servo-controlled latch managed by real-time clock alarms
